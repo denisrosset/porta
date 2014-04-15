@@ -834,7 +834,7 @@ int no_denom( int sysrow, int first, int last, int outmsg )
         porta_log( "\n");
     }   
     
-#if defined WIN32 || defined __CYGWIN32__
+#if defined WIN32 || defined __CYGWIN32__ || defined __APPLE__
     free(denom);
 #else // WIN32
     cfree(denom);

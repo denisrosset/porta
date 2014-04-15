@@ -515,7 +515,7 @@ void valid_ints( int eqdimpar, RAT *eqarpar, int neqpar,int eqrlpar,
     
     integ_rekurs(eqsum,iesum,0);
     
-#if defined WIN32
+#if defined WIN32 || defined __CYGWIN32__ || defined __APPLE__
     free(integ);
 #else // WIN32
     cfree(integ);

@@ -1477,7 +1477,7 @@ void writepoionie( FILE *fp, int fineq, int lineq, int points, int poi_ieq )
   }
   fprintf(fp,"\n");
   
-#if defined WIN32 || defined __CYGWIN32__
+#if defined WIN32 || defined __CYGWIN32__ || defined __APPLE__
   free(sumie);
 #else // WIN32
   cfree(sumie);
