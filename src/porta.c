@@ -44,6 +44,7 @@ REVISED BY ANDREAS LOEBEL
 #include "four_mot.h"
 #include "portsort.h"
 
+#define FILENAME_SIZE 1000
 
 FILE *logfile;
 
@@ -53,8 +54,8 @@ FILE *logfile;
 int main( int argc, char *argv[] )
 {
     int i, ieq_file, start;
-    char outfname[20];
-    char fname[20];
+    char outfname[FILENAME_SIZE];
+    char fname[FILENAME_SIZE];
     int   poi_file;
     int   rowl_inar, ierl;
     int  *indx = (int *)0;      
