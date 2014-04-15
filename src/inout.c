@@ -41,7 +41,7 @@ REVISED BY ANDREAS LOEBEL
 #include "log.h"
 
 
-#define MAXLINE 1000
+#define MAXLINE 100000
 
 
 
