@@ -1,0 +1,375 @@
+
+Contents:
+
+1.   General Information
+2.   General file format
+2.1. Format (sections) of '.ieq'-files
+2.2. Format (sections) of '.poi'- files
+3.   Installation
+4.   Program calls and parameters
+
+
+1. General Information:
+-----------------------
+
+PORTA is a collection of routines for analyzing polytopes and
+polyhedra. The polyhedra are either given as the convex hull 
+of a set of points plus (possibly) the convex cone of a set of
+vectors, specified in a '.poi'-file, or as a system of linear 
+equations and inequalities, specified in a '.ieq'-file - see
+file format descriptions below. The following routines are 
+available:
+
+dim      - computes the dimension of convex hull and convex
+           cone for a set of given points by using a gaussian
+           elimination algorithm. It displays the computed
+           dimension as a terminal message and also writes to
+           the end of the input file. If the input system is
+           not full dimensional, the equations satisfied by
+           the system are displayed.
+
+fctp     - checks whether a set of inequalities given in a
+           '.ieq'-file is facet inducing for a polyhedron given 
+           by a '.poi'-file. If this is not the case, points
+           and rays which are not valid are output into a file.
+           Points and rays that satisfy the inequality with
+           equality are also determined and output into a file
+           if there are any.
+
+fmel     - reads a system of linear inequalities and eliminates
+           choosen variables, i.e. given an index set I for 
+           variables to be eliminated, 'fmel' projects the given
+           system to the subspace given by x_{i} = 0 for i in I.
+
+iespo    - enumerates the subset of equations and inequalities
+           in an 'ieq' input file which are valid (but not neces-
+           sarily facet inducing) for a polyhedron given by a
+           'poi' input file.
+
+posie    - determines the number of points and direction vectors
+           from a set given in a '.poi'-file which are valid for
+           a system of equations and inqualities contained in a
+           '.ieq.'-file.
+
+portsort - puts the points or inequalities given in an input
+           file into an increasing order according to the fol-
+           lowing criteria:
+             - right hand sides of inequalities or equations
+             - frequency of the values -5 .. -1, 1 .. 5
+             - lexicographical order
+           Additionally 'portsort' formats the output. 
+
+traf     - carries out the transformation between the two poly-
+           hedron representations, the direction is determined
+           by the input filename suffix '.poi' or '.ieq' (see
+           file format description below). All computations are 
+           carried out in rational arithmetic using integer ope-
+           rations only to have guaranteed numerical results. A
+           possible arithmetic overflow is recognized. 
+
+           The computation of  the  ieq-representation is perfor-
+           med using Gaussian  and Fourier-Motzkin elimination.
+           In the output file the right hand sides are 0, or de-
+           termined by the smallest integer value for which the
+           coefficients of the inequality are integral. If this
+           is not possible with system integer arithmetic or if
+           multiple precision  integer arithmetic is set, the
+           right hand sides are 0 or 1 or -1 and the values are
+           reduced as far as possible. If PORTA terminates
+           successfully then the resulting inequalities 
+           are all facet-defining for your polyhedron and give
+           together with equations a minimal linear description
+           of your polyhedron.
+
+           If an ieq-representation is given as input and if 0
+           is not valid for the linear system, 'traf' needs a
+           valid point that must be specified additionally in    
+           the input by using the keyword VALID - see format de-
+           scription below. 'traf' transforms the ieq-represen-
+           tation to the poi-representation, after elimination  
+           of equations and 0-centering, by applying the 'poi'-
+           to-'ieq' direction to the polar polyhedron.
+           Hint: If you give a valid point or if 0 is valid,
+           then this vector may appear again in the resulting
+           system, even if this vector might be redundant in
+           a minimal description. (All other vectors are 
+           non-redundant.)
+
+vint     - enumerates all integral points within given bounds 
+           that are valid for a linear system of inequalities
+           and equations. The lower and upper bounds for each
+           component must be specified in the input file by the
+           keywords LOWER_BOUNDS and UPPER_BOUNDS - see format
+           desription below.
+
+
+2. General file format:
+-----------------------
+
+Files with name suffix '.ieq' contain a representation of a
+polyhedron as a system of linear equations and inequalities.
+Files with name suffix '.poi' contain a representation of a
+polyhedron as the convex hull of a set of points and possibly
+the convex cone of a set of vectors. The format is uniform
+for both of '.ieq'- and '.poi'-files in having several sections
+headed  by an indicator line with a specific capitalized key-
+word, the first line stating the dimension <n> as
+
+   DIM = <n>  
+
+and the last line containing the keyword
+
+   END  . 
+
+The sections are specific to the '.ieq' and '.poi' polyhedron
+representations with the exception of comment sections indica-
+ted by the keyword
+
+   COMMENT  ,
+
+and a 'valid'-section which may appear in both types of files.
+
+A 'valid'-section is headed by the keyword
+
+   VALID
+
+which indicates that the next line specifies a valid point for 
+the system of inequalities and equations by <n> rational values
+in the format 
+
+   <numerator>/<denominator> ...
+
+A denominator with value 1 can be omitted. A valid point is
+required by the function 'traf' in case 0 is not valid for the
+system.
+
+There is no restriction concerning the order of sections and
+some sections are optional. There are sections specific to PORTA 
+functions, such must be present in an input file for executing
+the corresponding function.
+
+
+2.1. Format (sections) of '.ieq'-files:
+---------------------------------------
+
+INEQUALITIES_SECTION       
+    
+   Subsequent lines contain inequalities or equations, one per
+   line, with format 
+
+   (<line>) <lhs> <rel> <rhs> 
+   
+      <line> - line number (optional)
+
+      <lhs>: <term{1}> +|- <term{2}>  ... +|- <term{n}>
+
+         <term{i}>: <num{i}>/<den{i}> x{i} , i in {1,...<n>} 
+
+      <rel>: <= | >= | => | =< | = | == 
+     
+      <rhs>: <num_rhs>/<den_rhs>
+
+   The values are rational, represented by numerators <num{i}>
+   and denominators <den{i}>, i taken from {1,...,<n>}. A deno-
+   minator with value 1 can be omitted.
+
+
+LOWER BOUNDS
+
+   The next line specifies lower bounds for the components of 
+   the system by <n> integer values such that the i-th entry re-
+   fers to the i-th component. The lower bounds are used by the
+   function 'vint' for enumerating integral points.
+
+
+UPPER BOUNDS
+
+   The next line specifies upper bounds for the components of 
+   the system by <n> integer values such that the i-th entry re-
+   fers to the i-th component. The upper bounds are used by the
+   function 'vint' for enumerating integral points.
+
+
+ElIMINATION ORDER 
+
+   The next line specifies a set of variables to be eliminated 
+   by the function 'fmel' and the order of elimination by <n> in-
+   teger values. A value 0 as the i-th entry of the line indicates 
+   that the i-th variable must not be eliminated, a value j, 0 < j,
+   j < <n>, as the i-th entry of the line indicates that the i-th
+   variable should be eliminated in the j-th iteration. All non- 
+   zero numbers must be different and it must be possible to put 
+   into an order 1,2,3,... .
+ 
+See file 'example.ieq' for '.ieq' format illustration.
+
+
+2.2. Format (sections) of '.poi'- files:
+----------------------------------------
+
+CONV_SECTION
+
+   Subsequent lines contain specifications of points, one per 
+   line by <n> rational values, the line format is 
+
+   (<line>) <num{1}>/<den{1}> ...  <num{n}>/<num{n}> 
+
+      <line> - line number (optional)
+
+      <num{i}> - i-th numerator
+      
+      <den{i}> - i-th denominator, a denominator with value 1
+                 can be omitted
+
+   If a CONV_SECTION is missing (the case of a cone) the origin 
+   is assumed to be feasible.
+
+
+CONE_SECTION
+
+   Subsequent lines contains specification of vectors, one per
+   line, the line format is the same as for points. 
+
+See file 'example.poi' for '.poi' format illustration.
+
+
+3. Installation:
+----------------
+
+A GNU Makefile is provided for producing the executables.
+
+1) Edit that file and enter your favorite compiler and compiler
+options - gcc works fine !!
+
+CFLAGS = -O3 
+CC     = gcc
+
+2) Just type 'make'.
+
+Makes an executable 'xporta' by compiling and linking the sources
+   common.c,
+   porta.c,
+   four_mot.c,
+   arith.c,
+   inout.c,
+   portsort.c,
+   largecalc.c,
+   mp.c,
+   log.c.
+   
+Makes an executable 'valid' by compiling and linking the sources
+   valid.c,
+   common.c,
+   arith.c,
+   inout.c.
+
+
+The executables are called by the (UNIX) drivers 
+   dim,
+   fctp,
+   fmel, 
+   iespo,
+   posie,
+   portsort,
+   traf,
+   vint
+provided for executing the corresponding PORTA functions.
+
+3) Unpack the man-pages `man1.tar' 
+     tar tvf man1.tar
+   and move them to your default man-path, e.g.
+     mv man1/* /usr/local/man/man1
+
+Program calls and parameters:
+----------------------------
+
+   dim [-pl] <filename>.poi
+
+       p - Unbuffered redirection of terminal messages into
+	   <filename>.prt
+
+       l - Use a special integer arithmetic 
+           allowing the integers to have arbitrary lengths.
+           This arithmetic is not as efficient as the system's
+           integer arithmetic with respect to time and storage
+           requirements. 
+           Note: Output values which exceed the 32-bit integer storage size 
+           are written in hexadecimal format (hex). Such hexadecimal
+           format can not be reread as input.          
+ 
+   fctp <filename1>.ieq <filename2>.poi
+
+       Filenames of output files are generated from <filename1>
+       by appending the number of an corresponding inequality
+       first and then the suffix '.poi' resp. '.poi.poi'.
+
+
+   fmel [-pcl] <filename>.ieq
+
+       p - Unbuffered redirection of terminal messages into
+	   <filename>.prt
+
+       c - Generation of new inequalities without the rule of
+	   Chernikov.
+
+       l - Use a special integer arithmetic 
+           allowing the integers to have arbitrary lengths.
+           This arithmetic is not as efficient as the system's
+           integer arithmetic with respect to time and storage
+           requirements. 
+           Note: Output values which exceed the 32-bit integer storage size 
+           are written in hexadecimal format (hex). Such hexadecimal
+           format can not be reread as input.          
+ 
+   iespo [-v] <filename1>.ieq <filename2>.poi
+
+       v - Table indicating strong validity printed in the output
+           file
+
+       The output is written into a file the name of which is de-
+       rived from <filename2> with suffix '.ieq'.
+
+
+   posie <filename1>.ieq <filename2>.poi
+
+       The output is written into a file with suffix '.poi' the
+       name of which is derived from <filename1>.
+
+
+   traf [-poscvl] <filename>.ieq    or
+   traf [-poscvl] <filename>.poi
+
+       p - Unbuffered redirection of terminal messages into
+	   <filename>.prt
+
+       o - Using a heuristic to eliminate that variable next,
+	   for which the number of new inequalities is minimal
+	   (local criterion). Inequalities which are recognized
+	   to be facet-inducing for the finite linear system are
+	   printed into a file as soon as they are identified.
+
+       c - Fourier-Motzkin elimination without using the rule of
+           Chernikov
+
+       s - Statistical part appended to each line with the number
+	   of coefficients
+
+       v - Table indicating strong validity printed in the output
+           file.
+
+       l - Use a special integer arithmetic 
+           allowing the integers to have arbitrary lengths.
+           This arithmetic is not as efficient as the system's
+           integer arithmetic with respect to time and storage
+           requirements. 
+           Note: Output values which exceed the 32-bit integer storage size 
+           are written in hexadecimal format (hex). Such hexadecimal
+           format can not be reread as input.          
+ 
+   vint <filename>.ieq
+     
+       Output is written into a file named <filename>.poi. 
+
+
+
+
